@@ -7,3 +7,5 @@
 - Created branch `feature/api-and-run-history`.
 - Added and approved the v0.3.0 design and implementation plan.
 - Push to GitHub is currently blocked by the local credential proxy; no remote state was changed.
+- Added SQLite `RunRepository` with snapshot persistence and recent-run summaries.
+- Repository tests and the full suite pass: 3 focused, 21 total.
