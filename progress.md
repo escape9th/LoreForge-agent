@@ -9,3 +9,5 @@
 - Push to GitHub is currently blocked by the local credential proxy; no remote state was changed.
 - Added SQLite `RunRepository` with snapshot persistence and recent-run summaries.
 - Repository tests and the full suite pass: 3 focused, 21 total.
+- Added `ResearchPackage.from_dict` and `RunService` for persisted workflow runs.
+- Service tests and the full suite pass: 3 focused, 24 total.

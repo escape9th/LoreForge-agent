@@ -108,3 +108,79 @@ class ResearchPackage:
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ResearchPackage":
+        brief_data = data["brief"]
+        brief = ResearchBrief(
+            prompt=str(brief_data["prompt"]),
+            run_id=str(brief_data["run_id"]),
+        )
+        questions = [
+            ResearchQuestion(text=str(item["text"]))
+            for item in data["questions"]
+        ]
+        sources = [
+            Source(
+                source_id=str(item["source_id"]),
+                title=str(item["title"]),
+                url=str(item["url"]),
+                summary=str(item["summary"]),
+                text=str(item["text"]),
+            )
+            for item in data["sources"]
+        ]
+        evidence = [
+            Evidence(
+                source_id=str(item["source_id"]),
+                quote=str(item["quote"]),
+            )
+            for item in data["evidence"]
+        ]
+        blueprint_data = data["blueprint"]
+        blueprint = CreativeBlueprint(
+            title=str(blueprint_data["title"]),
+            facts=[
+                Claim(text=str(item["text"]), kind=str(item["kind"]))
+                for item in blueprint_data["facts"]
+            ],
+            proposals=[
+                Claim(text=str(item["text"]), kind=str(item["kind"]))
+                for item in blueprint_data["proposals"]
+            ],
+            sections={
+                str(key): str(value)
+                for key, value in blueprint_data["sections"].items()
+            },
+        )
+        verification_data = data["verification"]
+        verification = VerificationReport(
+            checked_claims=int(verification_data["checked_claims"]),
+            supported_claims=int(verification_data["supported_claims"]),
+            unverified_claims=int(verification_data["unverified_claims"]),
+            items=[
+                VerificationItem(
+                    claim=str(item["claim"]),
+                    status=str(item["status"]),
+                    evidence=[str(value) for value in item["evidence"]],
+                )
+                for item in verification_data["items"]
+            ],
+        )
+        trace = [
+            TraceEvent(
+                stage=str(item["stage"]),
+                status=str(item["status"]),
+                detail=str(item["detail"]),
+                timestamp=str(item["timestamp"]),
+            )
+            for item in data["trace"]
+        ]
+        return cls(
+            brief=brief,
+            questions=questions,
+            sources=sources,
+            evidence=evidence,
+            blueprint=blueprint,
+            verification=verification,
+            trace=trace,
+        )
