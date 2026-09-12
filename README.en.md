@@ -19,6 +19,38 @@ python -m pytest -q
 python evaluation\run_evaluation.py
 ```
 
+## Run History
+
+Pass a SQLite path to persist the complete research package:
+
+```powershell
+python scripts\run_demo.py run "Design a resource-conflict quest" `
+  --out demo-output --db data\loreforge.sqlite3
+python scripts\run_demo.py history --db data\loreforge.sqlite3
+python scripts\run_demo.py show <run-id> --db data\loreforge.sqlite3
+```
+
+## FastAPI Service
+
+The API is optional and does not change the dependency-free Demo:
+
+```powershell
+.\.venv\Scripts\python -m pip install -e ".[api]"
+uvicorn loreforge.api:create_app --factory --reload
+```
+
+Endpoints:
+
+```text
+GET  /health
+POST /runs       {"prompt": "Design an original game world"}
+GET  /runs
+GET  /runs/{run_id}
+```
+
+The service stores history in `loreforge.db` by default. Set
+`LOREFORGE_HISTORY_DB` to choose another path.
+
 ## Why It Is Useful
 
 LoreForge is not just a chat wrapper. It exposes a typed research state, bounded workflow stages, provider interfaces, evidence records, verification output, and a trace that can be inspected or exported.
@@ -33,6 +65,7 @@ plan -> gather -> extract -> draft -> verify
 
 `AI Agent` `LLM` `RAG` `agent workflow` `creative writing` `worldbuilding`
 `game development` `anime` `knowledge grounding` `citation` `evaluation`
-`Python` `中文 Agent` `Chinese LLM` `智能体` `检索增强生成`
+`Python` `FastAPI` `SQLite` `REST API` `run history` `observability`
+`中文 Agent` `Chinese LLM` `智能体` `智能体平台` `检索增强生成`
 
 See the Chinese README and [`docs/architecture.md`](docs/architecture.md) for implementation details.

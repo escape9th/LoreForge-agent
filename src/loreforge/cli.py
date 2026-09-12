@@ -6,7 +6,10 @@ from pathlib import Path
 
 from .adapters import CorpusSearchProvider, OpenAICompatibleModelProvider
 from .config import Settings
+from .domain import ResearchPackage
+from .repository import RunRepository
 from .reporting import write_reports
+from .service import RunService
 from .workflow import run_research
 
 
@@ -24,6 +27,17 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="自定义 JSON 资料库；不提供时使用内置 Demo 资料",
     )
+    run_parser.add_argument(
+        "--db",
+        type=Path,
+        help="SQLite 运行历史路径；提供后会保存本次运行",
+    )
+    history_parser = subparsers.add_parser("history", help="查看最近的运行记录")
+    history_parser.add_argument("--db", type=Path, required=True)
+    history_parser.add_argument("--limit", type=int, default=20)
+    show_parser = subparsers.add_parser("show", help="查看一条运行记录")
+    show_parser.add_argument("run_id")
+    show_parser.add_argument("--db", type=Path, required=True)
     inspect_parser = subparsers.add_parser("inspect", help="查看 JSON 运行摘要")
     inspect_parser.add_argument("file", type=Path)
     return parser
@@ -47,10 +61,31 @@ def main(argv: list[str] | None = None) -> int:
             if not settings.use_demo_model
             else None
         )
-        package = run_research(args.prompt, search=search, model=model)
+        if args.db:
+            package = RunService(RunRepository(args.db)).create_run(
+                args.prompt,
+                corpus=args.corpus,
+            )
+        else:
+            package = run_research(args.prompt, search=search, model=model)
         markdown_path, json_path = write_reports(package, args.out)
         print(f"研究完成：{markdown_path}")
         print(f"运行记录：{json_path}")
+        if args.db:
+            print(f"数据库记录：{args.db}")
+        return 0
+    if args.command == "history":
+        service = RunService(RunRepository(args.db))
+        for summary in service.list_runs(args.limit):
+            print(f"{summary.run_id} | {summary.title} | {summary.prompt}")
+        return 0
+    if args.command == "show":
+        service = RunService(RunRepository(args.db))
+        package: ResearchPackage | None = service.get_run(args.run_id)
+        if package is None:
+            print(f"未找到运行记录：{args.run_id}")
+            return 1
+        print(json.dumps(package.to_dict(), ensure_ascii=False, indent=2))
         return 0
     data = json.loads(args.file.read_text(encoding="utf-8"))
     print(f"需求：{data['brief']['prompt']}")

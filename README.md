@@ -51,6 +51,39 @@ python -m pytest -q
 python evaluation\run_evaluation.py
 ```
 
+### 保存运行历史
+
+给 `run` 命令提供 SQLite 路径后，完整的研究包会保存到数据库：
+
+```powershell
+python scripts\run_demo.py run "设计一个资源冲突的游戏任务线" `
+  --out demo-output --db data\loreforge.sqlite3
+python scripts\run_demo.py history --db data\loreforge.sqlite3
+python scripts\run_demo.py show <run-id> --db data\loreforge.sqlite3
+```
+
+数据库只保存运行摘要和完整 JSON 快照，方便调试、复盘和后续接入 Web 工作台。
+
+### 启动 FastAPI 服务
+
+API 是可选依赖，不影响默认 Demo：
+
+```powershell
+.\.venv\Scripts\python -m pip install -e ".[api]"
+uvicorn loreforge.api:create_app --factory --reload
+```
+
+主要接口：
+
+```text
+GET  /health
+POST /runs       {"prompt": "设计一个原创游戏世界观"}
+GET  /runs
+GET  /runs/{run_id}
+```
+
+服务默认使用 `loreforge.db` 保存历史，也可以通过 `LOREFORGE_HISTORY_DB` 指定数据库路径。
+
 ### 使用自己的资料库
 
 资料库是一个 JSON 数组，每个元素至少包含 `source_id`、`title`、`url` 和 `text`：
@@ -106,7 +139,11 @@ src/loreforge/
 ├── workflow.py     # 有边界的 Agent 工作流
 ├── verification.py # 事实声明核验
 ├── reporting.py    # Markdown/JSON 报告
-└── cli.py          # 命令行入口
+├── repository.py    # SQLite 运行历史
+├── service.py       # CLI/API 共用服务层
+├── api.py           # FastAPI HTTP 接口
+├── evaluation.py    # 共享结构化评测
+└── cli.py           # 命令行入口
 ```
 
 ## 当前限制
@@ -114,7 +151,7 @@ src/loreforge/
 - Demo 资料是内置的，不是实时联网搜索。
 - 核验使用可解释的关键词重叠算法，不等同于完整事实核查。
 - 第一版只有一次生成和一次核验，没有多 Agent 协作。
-- 没有数据库和 Web 前端，先保持 Demo 小而完整。
+- API 目前没有认证、任务队列和 Web 前端，适合作为本地研究服务和二次开发基础。
 
 ## 学习文档
 
@@ -126,4 +163,6 @@ src/loreforge/
 
 `ai-agent` `llm` `rag` `agent-workflow` `creative-writing` `worldbuilding`
 `game-development` `knowledge-grounding` `citation` `evaluation` `python`
-`中文agent` `中文大模型` `智能体` `检索增强生成` `游戏世界观` `小说创作`
+`fastapi` `sqlite` `rest-api` `run-history` `observability`
+`中文agent` `中文大模型` `智能体` `智能体平台` `检索增强生成`
+`游戏世界观` `小说创作` `运行记录` `可观测性`

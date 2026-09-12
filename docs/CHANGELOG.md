@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.0 - 2026-09-12
+
+### Added
+
+- SQLite-backed run history with complete JSON snapshots.
+- Shared `RunService` for CLI and API workflows.
+- Optional FastAPI service with health, create, list, and detail endpoints.
+- CLI `--db`, `history`, and `show` commands.
+- Shared structured evaluation module used by the evaluation script.
+- Optional `api` dependency group for FastAPI and Uvicorn.
+- English and Chinese discovery keywords for API, SQLite, observability, and Agent platform use cases.
+
 ## 0.2.0 - 2026-09-12
 
 ### Added

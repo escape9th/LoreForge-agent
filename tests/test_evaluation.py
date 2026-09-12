@@ -1,4 +1,5 @@
 from loreforge.demo import DemoModelProvider, DemoSearchProvider
+from loreforge.evaluation import score_prompt
 from loreforge.workflow import run_research
 
 
@@ -14,3 +15,9 @@ def test_demo_case_meets_minimum_quality_bar():
     assert package.verification.checked_claims == len(package.blueprint.facts)
     assert package.verification.supported_claims >= 2
 
+
+def test_shared_evaluation_scores_a_prompt():
+    score, passed = score_prompt("设计一个能体现资源冲突的游戏任务线")
+
+    assert score == 5
+    assert "事实与提案分离" in passed

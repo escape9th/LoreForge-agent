@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from . import __version__
 from .domain import ResearchPackage
 from .repository import RunRepository
 from .service import RunService
@@ -48,12 +49,12 @@ def create_app(
     app = FastAPI(
         title="LoreForge API",
         description="Evidence-backed creative research Agent service.",
-        version="0.3.0",
+        version=__version__,
     )
 
     @app.get("/health")
     def health() -> dict[str, str]:
-        return {"status": "ok", "version": "0.3.0"}
+        return {"status": "ok", "version": __version__}
 
     @app.post("/runs")
     def create_run(request: RunRequest) -> dict[str, Any]:

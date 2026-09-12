@@ -13,3 +13,5 @@
 - Service tests and the full suite pass: 3 focused, 24 total.
 - Added optional FastAPI app with health, create, list, and detail run endpoints.
 - API tests and the full suite pass: 3 focused, 27 total; Starlette emits one existing deprecation warning.
+- Added CLI database history commands, shared evaluation scoring, optional API dependencies, and v0.3.0 documentation.
+- Release verification passed: 30 tests, 4 evaluation cases at 5/5, compileall, diff check, and manual CLI history/detail flow.

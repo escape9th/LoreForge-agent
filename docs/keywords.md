@@ -17,6 +17,11 @@ These keywords describe capabilities that actually exist in the repository. They
 - game development
 - anime research
 - Python Agent
+- FastAPI
+- SQLite run history
+- REST API
+- observability
+- Agent platform
 
 ## 中文
 
@@ -32,5 +37,10 @@ These keywords describe capabilities that actually exist in the repository. They
 - 小说创作
 - 动漫创作
 - AI 编剧
+- 智能体平台
+- 运行记录
+- 可观测性
+- FastAPI 服务
+- SQLite 持久化
 
 Use only keywords that match a repository capability. Search visibility is useful when it helps the right users find the project, not when it creates unrelated traffic.
