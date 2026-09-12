@@ -9,7 +9,7 @@ Add SQLite run history, a service layer, a FastAPI API, and shared evaluation wi
 - [x] Phase 1: Design and implementation plan
 - [x] Phase 2: SQLite repository
 - [x] Phase 3: Service layer and deserialization
-- [ ] Phase 4: FastAPI API
+- [x] Phase 4: FastAPI API
 - [ ] Phase 5: CLI, evaluation, docs, and release verification
 - [ ] Phase 6: Commit and remote push attempt
 

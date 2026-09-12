@@ -11,3 +11,5 @@
 - Repository tests and the full suite pass: 3 focused, 21 total.
 - Added `ResearchPackage.from_dict` and `RunService` for persisted workflow runs.
 - Service tests and the full suite pass: 3 focused, 24 total.
+- Added optional FastAPI app with health, create, list, and detail run endpoints.
+- API tests and the full suite pass: 3 focused, 27 total; Starlette emits one existing deprecation warning.
