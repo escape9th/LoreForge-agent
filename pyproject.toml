@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "loreforge"
-version = "0.1.0"
+version = "0.2.0"
 description = "Evidence-backed creative research Agent demo"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -16,4 +16,3 @@ loreforge = "loreforge.cli:main"
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
-

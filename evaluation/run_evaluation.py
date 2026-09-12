@@ -10,6 +10,8 @@ from loreforge.workflow import run_research
 CASES = [
     "设计一个受海洋灾变影响的漂浮城市游戏世界观",
     "为一个资源稀缺的海上社区设计游戏冲突",
+    "为一名失去记忆的动漫角色设计人物弧光",
+    "设计一个能体现资源冲突的游戏任务线",
 ]
 
 
@@ -36,4 +38,3 @@ if __name__ == "__main__":
         print(f"[{total}/5] {case}")
         print("  " + "、".join(passed))
     print(f"通过 {len(CASES)} 个 Demo 评测案例")
-

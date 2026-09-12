@@ -33,3 +33,27 @@ def test_duplicate_sources_are_removed():
     )
     urls = [source.url for source in package.sources]
     assert len(urls) == len(set(urls))
+
+
+def test_demo_workflow_supports_character_design():
+    package = run_research(
+        "为一名失去记忆的动漫角色设计人物弧光",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+
+    assert any("角色" in question.text for question in package.questions)
+    assert package.blueprint.proposals
+    assert package.sources
+
+
+def test_demo_workflow_supports_game_quest_design():
+    package = run_research(
+        "设计一个能体现资源冲突的游戏任务线",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+
+    assert any("任务" in question.text for question in package.questions)
+    assert "玩法钩子" in package.blueprint.sections
+    assert package.verification.checked_claims > 0

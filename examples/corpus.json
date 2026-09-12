@@ -1,0 +1,16 @@
+[
+  {
+    "source_id": "example-01",
+    "title": "模块化漂浮平台",
+    "url": "https://example.org/loreforge/example-platforms",
+    "summary": "模块化平台可以被拆分、维护和扩建。",
+    "text": "模块化平台可以被拆分、维护和扩建，适合需要长期适应环境的漂浮城市。"
+  },
+  {
+    "source_id": "example-02",
+    "title": "社区资源配给",
+    "url": "https://example.org/loreforge/example-governance",
+    "summary": "资源配给会改变社区的治理结构。",
+    "text": "淡水和能源配给会改变社区的治理结构，并形成新的协作与冲突。"
+  }
+]

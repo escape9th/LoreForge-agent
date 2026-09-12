@@ -1,5 +1,9 @@
 # LoreForge
 
+![CI](https://github.com/escape9th/245/actions/workflows/ci.yml/badge.svg)
+
+**中文 Agent / AI Agent / LLM / RAG / 创作研究 / 游戏世界观 / Worldbuilding**
+
 LoreForge 是一个证据驱动的创作研究 Agent Demo。
 
 它面向动漫、游戏和原创世界观创作：输入一个创作需求，系统会拆解研究问题，检索演示资料，提取证据，生成创作蓝图，并核验哪些事实有来源支持。
@@ -7,6 +11,8 @@ LoreForge 是一个证据驱动的创作研究 Agent Demo。
 ## 运行
 
 项目默认只使用 Python 标准库，不需要 API Key。
+
+English overview: [`README.en.md`](README.en.md)
 
 最简单的运行方式不需要安装第三方依赖：
 
@@ -45,6 +51,27 @@ python -m pytest -q
 python evaluation\run_evaluation.py
 ```
 
+### 使用自己的资料库
+
+资料库是一个 JSON 数组，每个元素至少包含 `source_id`、`title`、`url` 和 `text`：
+
+```powershell
+python scripts\run_demo.py run "分析这个世界观的能源系统" --corpus examples\corpus.json
+```
+
+### 接入 OpenAI-compatible 模型
+
+设置以下环境变量后，CLI 会自动切换到真实模型 Provider：
+
+```powershell
+$env:LOREFORGE_MODEL_ENDPOINT = "https://your-provider.example/v1/chat/completions"
+$env:LOREFORGE_MODEL_API_KEY = "your-api-key"
+$env:LOREFORGE_MODEL_NAME = "your-model-name"
+python scripts\run_demo.py run "设计一个原创游戏世界观"
+```
+
+不设置这些变量时，系统继续使用无需联网的 Demo Provider。
+
 ## 工作流
 
 ```text
@@ -56,6 +83,13 @@ plan -> gather -> extract -> draft -> verify
 - `extract`：把资料保存成可引用的证据。
 - `draft`：分别生成资料事实和原创提案。
 - `verify`：检查事实声明是否能被证据支持。
+
+## 关键词
+
+`AI Agent` `LLM` `RAG` `Agent workflow` `creative writing` `worldbuilding`
+`game development` `anime` `knowledge grounding` `citation` `evaluation`
+`中文 Agent` `中文大模型` `智能体` `检索增强生成` `游戏世界观` `小说创作`
+`动漫创作` `可观测性` `结构化输出`
 
 ## 为什么不是普通聊天机器人
 
@@ -85,3 +119,11 @@ src/loreforge/
 ## 学习文档
 
 完整中文教学请阅读 [`docs/学习手册.md`](docs/学习手册.md)。
+
+## GitHub Topics 建议
+
+建议在仓库设置中添加这些与真实功能对应的 Topics：
+
+`ai-agent` `llm` `rag` `agent-workflow` `creative-writing` `worldbuilding`
+`game-development` `knowledge-grounding` `citation` `evaluation` `python`
+`中文agent` `中文大模型` `智能体` `检索增强生成` `游戏世界观` `小说创作`
