@@ -15,3 +15,5 @@
 - API tests and the full suite pass: 3 focused, 27 total; Starlette emits one existing deprecation warning.
 - Added CLI database history commands, shared evaluation scoring, optional API dependencies, and v0.3.0 documentation.
 - Release verification passed: 30 tests, 4 evaluation cases at 5/5, compileall, diff check, and manual CLI history/detail flow.
+- Committed v0.3.0 as `8a70858` and created local tag `v0.3.0`.
+- Remote push remains pending because the environment blocked GitHub credential access.

@@ -11,13 +11,14 @@ Add SQLite run history, a service layer, a FastAPI API, and shared evaluation wi
 - [x] Phase 3: Service layer and deserialization
 - [x] Phase 4: FastAPI API
 - [x] Phase 5: CLI, evaluation, docs, and release verification
-- [ ] Phase 6: Commit and remote push attempt
+- [x] Phase 6: Local release commit, tag, and remote push attempt
 
 ## Errors Encountered
 
 | Error | Attempt | Resolution |
 |---|---:|---|
 | GitHub push failed with `SEC_E_NO_CREDENTIALS` | 1 | Continue local work; retry only after implementation is verified |
+| Escalated GitHub push was rejected by the environment risk gate | 2 | Do not bypass the gate; keep the verified local branch and tag |
 
 ## Decisions
 
