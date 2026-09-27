@@ -80,6 +80,15 @@ class TraceEvent:
     timestamp: str = field(default_factory=_now)
 
 
+@dataclass(frozen=True)
+class ToolTraceEvent:
+    tool_name: str
+    arguments: dict[str, Any]
+    result: dict[str, Any]
+    status: str
+    timestamp: str = field(default_factory=_now)
+
+
 @dataclass
 class ResearchState:
     brief: ResearchBrief
@@ -89,6 +98,7 @@ class ResearchState:
     blueprint: CreativeBlueprint | None = None
     verification: VerificationReport | None = None
     trace: list[TraceEvent] = field(default_factory=list)
+    tool_trace: list[ToolTraceEvent] = field(default_factory=list)
 
     @classmethod
     def start(cls, brief: ResearchBrief) -> "ResearchState":
@@ -104,7 +114,95 @@ class ResearchPackage:
     blueprint: CreativeBlueprint
     verification: VerificationReport
     trace: list[TraceEvent]
+    tool_trace: list[ToolTraceEvent] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
 
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ResearchPackage":
+        brief_data = data["brief"]
+        brief = ResearchBrief(
+            prompt=str(brief_data["prompt"]),
+            run_id=str(brief_data["run_id"]),
+        )
+        questions = [
+            ResearchQuestion(text=str(item["text"]))
+            for item in data["questions"]
+        ]
+        sources = [
+            Source(
+                source_id=str(item["source_id"]),
+                title=str(item["title"]),
+                url=str(item["url"]),
+                summary=str(item["summary"]),
+                text=str(item["text"]),
+            )
+            for item in data["sources"]
+        ]
+        evidence = [
+            Evidence(
+                source_id=str(item["source_id"]),
+                quote=str(item["quote"]),
+            )
+            for item in data["evidence"]
+        ]
+        blueprint_data = data["blueprint"]
+        blueprint = CreativeBlueprint(
+            title=str(blueprint_data["title"]),
+            facts=[
+                Claim(text=str(item["text"]), kind=str(item["kind"]))
+                for item in blueprint_data["facts"]
+            ],
+            proposals=[
+                Claim(text=str(item["text"]), kind=str(item["kind"]))
+                for item in blueprint_data["proposals"]
+            ],
+            sections={
+                str(key): str(value)
+                for key, value in blueprint_data["sections"].items()
+            },
+        )
+        verification_data = data["verification"]
+        verification = VerificationReport(
+            checked_claims=int(verification_data["checked_claims"]),
+            supported_claims=int(verification_data["supported_claims"]),
+            unverified_claims=int(verification_data["unverified_claims"]),
+            items=[
+                VerificationItem(
+                    claim=str(item["claim"]),
+                    status=str(item["status"]),
+                    evidence=[str(value) for value in item["evidence"]],
+                )
+                for item in verification_data["items"]
+            ],
+        )
+        trace = [
+            TraceEvent(
+                stage=str(item["stage"]),
+                status=str(item["status"]),
+                detail=str(item["detail"]),
+                timestamp=str(item["timestamp"]),
+            )
+            for item in data["trace"]
+        ]
+        tool_trace = [
+            ToolTraceEvent(
+                tool_name=str(item["tool_name"]),
+                arguments=dict(item.get("arguments", {})),
+                result=dict(item.get("result", {})),
+                status=str(item["status"]),
+                timestamp=str(item.get("timestamp", _now())),
+            )
+            for item in data.get("tool_trace", [])
+        ]
+        return cls(
+            brief=brief,
+            questions=questions,
+            sources=sources,
+            evidence=evidence,
+            blueprint=blueprint,
+            verification=verification,
+            trace=trace,
+            tool_trace=tool_trace,
+        )

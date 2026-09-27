@@ -1,4 +1,5 @@
 from loreforge.demo import DemoSearchProvider, DemoModelProvider
+from loreforge.domain import ResearchPackage
 from loreforge.workflow import run_research
 
 
@@ -16,6 +17,7 @@ def test_demo_workflow_builds_evidence_backed_package():
     assert package.blueprint.proposals
     assert package.verification.checked_claims >= 1
     assert package.verification.unverified_claims == 0
+    assert package.tool_trace
     assert [event.stage for event in package.trace] == [
         "plan",
         "gather",
@@ -33,3 +35,54 @@ def test_duplicate_sources_are_removed():
     )
     urls = [source.url for source in package.sources]
     assert len(urls) == len(set(urls))
+
+
+def test_demo_workflow_supports_character_design():
+    package = run_research(
+        "为一名失去记忆的动漫角色设计人物弧光",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+
+    assert any("角色" in question.text for question in package.questions)
+    assert package.blueprint.proposals
+    assert package.sources
+
+
+def test_demo_workflow_supports_game_quest_design():
+    package = run_research(
+        "设计一个能体现资源冲突的游戏任务线",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+
+    assert any("任务" in question.text for question in package.questions)
+    assert "玩法钩子" in package.blueprint.sections
+    assert package.verification.checked_claims > 0
+
+
+def test_research_package_round_trips_through_dict():
+    package = run_research(
+        "设计一个失忆角色",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+
+    restored = ResearchPackage.from_dict(package.to_dict())
+
+    assert restored == package
+
+
+def test_research_package_loads_a_pre_tool_trace_snapshot():
+    package = run_research(
+        "设计一个失忆角色",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+    legacy_data = package.to_dict()
+    legacy_data.pop("tool_trace")
+
+    restored = ResearchPackage.from_dict(legacy_data)
+
+    assert restored.brief == package.brief
+    assert restored.tool_trace == []

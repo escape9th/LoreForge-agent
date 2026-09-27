@@ -1,0 +1,30 @@
+# Progress
+
+## 2026-09-27
+
+- Approved the offline plus real-model Tool Calling design for v0.4.0.
+- Added tool schemas, registry dispatch, four built-in tools, and structured failures.
+- Added a bounded Tool Calling agent and deterministic offline provider.
+- Added OpenAI-compatible tools/tool_calls parsing and correct tool_call_id replay.
+- Integrated tool traces into workflow packages, reports, persistence, API, CLI, and evaluation.
+- Added tests for tool dispatch, failures, call limits, provider protocol, and configuration.
+- Added a complete Chinese architecture, reproduction, and interview guide.
+- Full release verification passed: 46 tests, 4 evaluation cases at 7/7, compileall, diff check, and manual CLI Tool Calling flow.
+
+## 2026-09-12
+
+- Confirmed v0.2.0 tests: 18 passed.
+- Committed v0.2.0 as `476cc81`.
+- Created branch `feature/api-and-run-history`.
+- Added and approved the v0.3.0 design and implementation plan.
+- Push to GitHub is currently blocked by the local credential proxy; no remote state was changed.
+- Added SQLite `RunRepository` with snapshot persistence and recent-run summaries.
+- Repository tests and the full suite pass: 3 focused, 21 total.
+- Added `ResearchPackage.from_dict` and `RunService` for persisted workflow runs.
+- Service tests and the full suite pass: 3 focused, 24 total.
+- Added optional FastAPI app with health, create, list, and detail run endpoints.
+- API tests and the full suite pass: 3 focused, 27 total; Starlette emits one existing deprecation warning.
+- Added CLI database history commands, shared evaluation scoring, optional API dependencies, and v0.3.0 documentation.
+- Release verification passed: 30 tests, 4 evaluation cases at 5/5, compileall, diff check, and manual CLI history/detail flow.
+- Committed v0.3.0 as `8a70858` and created local tag `v0.3.0`.
+- Remote push remains pending because the environment blocked GitHub credential access.

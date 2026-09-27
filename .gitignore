@@ -6,3 +6,6 @@ dist/
 build/
 *.egg-info/
 demo-output*/
+gcm-diagnose.log
+*.db
+*.sqlite3
