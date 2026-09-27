@@ -1,6 +1,6 @@
 # LoreForge
 
-![CI](https://github.com/escape9th/245/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/escape9th/LoreForge-agent/actions/workflows/ci.yml/badge.svg)
 
 
 **中文 Agent / AI Agent / LLM / RAG / Tool Calling / Function Calling / 创作研究 / 游戏世界观 / Worldbuilding**
