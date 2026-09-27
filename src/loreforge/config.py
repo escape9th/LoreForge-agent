@@ -9,6 +9,7 @@ class Settings:
     model_endpoint: str | None = None
     model_api_key: str | None = None
     model_name: str = "default-model"
+    max_tool_calls: int = 6
 
     @property
     def use_demo_model(self) -> bool:
@@ -20,5 +21,5 @@ class Settings:
             model_endpoint=os.getenv("LOREFORGE_MODEL_ENDPOINT"),
             model_api_key=os.getenv("LOREFORGE_MODEL_API_KEY"),
             model_name=os.getenv("LOREFORGE_MODEL_NAME", "default-model"),
+            max_tool_calls=max(1, int(os.getenv("LOREFORGE_MAX_TOOL_CALLS", "6"))),
         )
-

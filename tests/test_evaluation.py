@@ -19,5 +19,6 @@ def test_demo_case_meets_minimum_quality_bar():
 def test_shared_evaluation_scores_a_prompt():
     score, passed = score_prompt("设计一个能体现资源冲突的游戏任务线")
 
-    assert score == 5
+    assert score == 7
     assert "事实与提案分离" in passed
+    assert "有工具调用轨迹" in passed

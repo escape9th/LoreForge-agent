@@ -80,6 +80,15 @@ class TraceEvent:
     timestamp: str = field(default_factory=_now)
 
 
+@dataclass(frozen=True)
+class ToolTraceEvent:
+    tool_name: str
+    arguments: dict[str, Any]
+    result: dict[str, Any]
+    status: str
+    timestamp: str = field(default_factory=_now)
+
+
 @dataclass
 class ResearchState:
     brief: ResearchBrief
@@ -89,6 +98,7 @@ class ResearchState:
     blueprint: CreativeBlueprint | None = None
     verification: VerificationReport | None = None
     trace: list[TraceEvent] = field(default_factory=list)
+    tool_trace: list[ToolTraceEvent] = field(default_factory=list)
 
     @classmethod
     def start(cls, brief: ResearchBrief) -> "ResearchState":
@@ -104,6 +114,7 @@ class ResearchPackage:
     blueprint: CreativeBlueprint
     verification: VerificationReport
     trace: list[TraceEvent]
+    tool_trace: list[ToolTraceEvent] = field(default_factory=list)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -175,6 +186,16 @@ class ResearchPackage:
             )
             for item in data["trace"]
         ]
+        tool_trace = [
+            ToolTraceEvent(
+                tool_name=str(item["tool_name"]),
+                arguments=dict(item.get("arguments", {})),
+                result=dict(item.get("result", {})),
+                status=str(item["status"]),
+                timestamp=str(item.get("timestamp", _now())),
+            )
+            for item in data.get("tool_trace", [])
+        ]
         return cls(
             brief=brief,
             questions=questions,
@@ -183,4 +204,5 @@ class ResearchPackage:
             blueprint=blueprint,
             verification=verification,
             trace=trace,
+            tool_trace=tool_trace,
         )

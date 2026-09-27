@@ -18,6 +18,7 @@ def test_run_command_writes_markdown_and_json(tmp_path, capsys):
     json_file = next(file for file in files if file.suffix == ".json")
     data = json.loads(json_file.read_text(encoding="utf-8"))
     assert data["verification"]["checked_claims"] >= 2
+    assert data["tool_trace"]
     assert "研究完成" in capsys.readouterr().out
 
 

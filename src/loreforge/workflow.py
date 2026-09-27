@@ -1,7 +1,9 @@
 from __future__ import annotations
 
-from .demo import DemoModelProvider, DemoSearchProvider, ModelProvider, SearchProvider
+from .demo import DemoModelProvider, DemoSearchProvider, DemoToolCallingProvider, ModelProvider, SearchProvider
 from .domain import Evidence, ResearchBrief, ResearchPackage, ResearchState, TraceEvent
+from .toolcalling import ToolCallingAgent, ToolCallingProvider
+from .tools import build_default_registry
 from .verification import verify_claims
 
 
@@ -16,6 +18,9 @@ def run_research(
     model: ModelProvider | None = None,
     max_questions: int = 3,
     max_sources: int = 6,
+    tool_agent: ToolCallingAgent | None = None,
+    tool_provider: ToolCallingProvider | None = None,
+    max_tool_calls: int = 6,
 ) -> ResearchPackage:
     brief = ResearchBrief.from_prompt(prompt)
     search = search or DemoSearchProvider()
@@ -25,9 +30,18 @@ def run_research(
     state.questions = model.plan(brief)[:max_questions]
     _mark(state, "plan", f"拆解出 {len(state.questions)} 个研究问题")
 
-    gathered: list = []
-    for question in state.questions:
-        gathered.extend(search.search(question.text, limit=2))
+    if tool_agent is None:
+        tool_agent = ToolCallingAgent(
+            tool_provider or DemoToolCallingProvider(),
+            build_default_registry(search),
+            max_tool_calls=max_tool_calls,
+        )
+    tool_result = tool_agent.run(f"{brief.prompt}\n研究问题：{[q.text for q in state.questions]}")
+    state.tool_trace = tool_result.trace
+    gathered = tool_result.sources
+    if not gathered:
+        for question in state.questions:
+            gathered.extend(search.search(question.text, limit=2))
     unique: dict[str, object] = {}
     for source in gathered:
         unique.setdefault(source.url.rstrip("/").lower(), source)
@@ -58,5 +72,5 @@ def run_research(
         blueprint=state.blueprint,
         verification=state.verification,
         trace=state.trace,
+        tool_trace=state.tool_trace,
     )
-

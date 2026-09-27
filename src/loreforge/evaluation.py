@@ -18,6 +18,10 @@ def score_prompt(prompt: str) -> tuple[int, list[str]]:
             package.blueprint.facts and package.blueprint.proposals
         ),
         "有核验结果": package.verification.checked_claims > 0,
+        "有工具调用轨迹": bool(package.tool_trace),
+        "工具调用成功": bool(package.tool_trace) and all(
+            event.status == "success" for event in package.tool_trace
+        ),
     }
     passed = [name for name, ok in checks.items() if ok]
     return len(passed), passed

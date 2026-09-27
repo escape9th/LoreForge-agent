@@ -17,6 +17,7 @@ def test_demo_workflow_builds_evidence_backed_package():
     assert package.blueprint.proposals
     assert package.verification.checked_claims >= 1
     assert package.verification.unverified_claims == 0
+    assert package.tool_trace
     assert [event.stage for event in package.trace] == [
         "plan",
         "gather",

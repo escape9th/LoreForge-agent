@@ -32,6 +32,12 @@ def build_parser() -> argparse.ArgumentParser:
         type=Path,
         help="SQLite 运行历史路径；提供后会保存本次运行",
     )
+    run_parser.add_argument(
+        "--max-tool-calls",
+        type=int,
+        default=None,
+        help="单次运行最多调用工具的次数",
+    )
     history_parser = subparsers.add_parser("history", help="查看最近的运行记录")
     history_parser.add_argument("--db", type=Path, required=True)
     history_parser.add_argument("--limit", type=int, default=20)
@@ -67,7 +73,12 @@ def main(argv: list[str] | None = None) -> int:
                 corpus=args.corpus,
             )
         else:
-            package = run_research(args.prompt, search=search, model=model)
+            package = run_research(
+                args.prompt,
+                search=search,
+                model=model,
+                max_tool_calls=args.max_tool_calls or settings.max_tool_calls,
+            )
         markdown_path, json_path = write_reports(package, args.out)
         print(f"研究完成：{markdown_path}")
         print(f"运行记录：{json_path}")
@@ -92,4 +103,5 @@ def main(argv: list[str] | None = None) -> int:
     print(f"来源：{len(data['sources'])}")
     print(f"事实核验：{data['verification']['supported_claims']}/"
           f"{data['verification']['checked_claims']} 条有证据支持")
+    print(f"工具调用：{len(data.get('tool_trace', []))} 次")
     return 0

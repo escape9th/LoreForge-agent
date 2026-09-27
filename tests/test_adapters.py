@@ -2,7 +2,11 @@ import json
 
 import pytest
 
-from loreforge.adapters import CorpusSearchProvider, OpenAICompatibleModelProvider
+from loreforge.adapters import (
+    CorpusSearchProvider,
+    OpenAICompatibleModelProvider,
+    OpenAICompatibleToolCallingProvider,
+)
 from loreforge.domain import ResearchBrief
 
 
@@ -95,3 +99,51 @@ def test_openai_compatible_provider_accepts_json_code_fence():
     )
 
     assert provider.plan(ResearchBrief.from_prompt("floating city"))[0].text == "What changes?"
+
+
+def test_openai_compatible_tool_provider_sends_schemas_and_parses_tool_call():
+    calls = []
+
+    def transport(endpoint, headers, payload):
+        calls.append(payload)
+        return {
+            "choices": [{
+                "message": {
+                    "tool_calls": [{
+                        "function": {
+                            "name": "corpus_search",
+                            "arguments": '{"query": "floating city", "limit": 2}',
+                        }
+                    }]
+                }
+            }]
+        }
+
+    provider = OpenAICompatibleToolCallingProvider(
+        endpoint="https://model.example.test/v1/chat/completions",
+        api_key="test-key",
+        model="demo-model",
+        transport=transport,
+    )
+
+    action = provider.next_action("floating city", [], [{"type": "function"}])
+
+    assert action == {
+        "type": "tool_call",
+        "name": "corpus_search",
+        "arguments": {"query": "floating city", "limit": 2},
+    }
+    assert calls[0]["tools"] == [{"type": "function"}]
+
+
+def test_openai_compatible_tool_provider_parses_final_action():
+    provider = OpenAICompatibleToolCallingProvider(
+        endpoint="https://model.example.test/v1/chat/completions",
+        api_key="test-key",
+        model="demo-model",
+        transport=lambda endpoint, headers, payload: {
+            "choices": [{"message": {"content": '{"type": "final"}'}}]
+        },
+    )
+
+    assert provider.next_action("done", [], []) == {"type": "final"}

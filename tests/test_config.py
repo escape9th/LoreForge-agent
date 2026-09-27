@@ -21,3 +21,9 @@ def test_settings_defaults_to_demo_provider(monkeypatch):
     settings = Settings.from_env()
 
     assert settings.use_demo_model is True
+
+
+def test_settings_reads_tool_call_limit(monkeypatch):
+    monkeypatch.setenv("LOREFORGE_MAX_TOOL_CALLS", "4")
+
+    assert Settings.from_env().max_tool_calls == 4

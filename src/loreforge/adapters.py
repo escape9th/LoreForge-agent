@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from .demo import ModelProvider, SearchProvider
+from .toolcalling import ToolCallingProvider
 from .domain import (
     Claim,
     CreativeBlueprint,
@@ -164,3 +165,63 @@ class OpenAICompatibleModelProvider(ModelProvider):
             proposals=proposals,
             sections=sections,
         )
+
+
+@dataclass
+class OpenAICompatibleToolCallingProvider(ToolCallingProvider):
+    endpoint: str
+    api_key: str
+    model: str
+    transport: Transport = _urllib_transport
+
+    def next_action(
+        self,
+        prompt: str,
+        context: list[dict[str, Any]],
+        tool_schemas: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        messages: list[dict[str, Any]] = [
+            {
+                "role": "system",
+                "content": (
+                    "You are a research agent. Use tools when evidence is needed. "
+                    "Return a final object with type=final when done."
+                ),
+            },
+            {"role": "user", "content": prompt},
+        ]
+        for item in context:
+            messages.append({"role": "tool", "content": json.dumps(item, ensure_ascii=False)})
+        response = self.transport(
+            self.endpoint,
+            {"Authorization": f"Bearer {self.api_key}"},
+            {
+                "model": self.model,
+                "temperature": 0.2,
+                "messages": messages,
+                "tools": tool_schemas,
+                "tool_choice": "auto",
+            },
+        )
+        try:
+            message = response["choices"][0]["message"]
+        except (KeyError, IndexError, TypeError) as exc:
+            raise ValueError("tool-calling response must contain choices.message") from exc
+        tool_calls = message.get("tool_calls")
+        if tool_calls:
+            call = tool_calls[0]
+            try:
+                function = call["function"]
+                arguments = _parse_json_content(function.get("arguments", "{}"))
+                return {
+                    "type": "tool_call",
+                    "name": str(function["name"]),
+                    "arguments": arguments,
+                }
+            except (KeyError, TypeError, ValueError) as exc:
+                raise ValueError("tool call must contain a function name and JSON arguments") from exc
+        content = message.get("content")
+        payload = _parse_json_content(content)
+        if payload.get("type") != "final":
+            raise ValueError("final tool-calling response must have type=final")
+        return payload

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from typing import Protocol
+from typing import Any
 
 from .domain import (
     Claim,
@@ -26,6 +27,34 @@ class ModelProvider(Protocol):
         questions: list[ResearchQuestion],
         sources: list[Source],
     ) -> CreativeBlueprint: ...
+
+
+@dataclass
+class DemoToolCallingProvider:
+    """Deterministic stand-in for an LLM that supports function calling."""
+
+    def next_action(
+        self,
+        prompt: str,
+        context: list[dict[str, Any]],
+        tool_schemas: list[dict[str, Any]],
+    ) -> dict[str, Any]:
+        names = [item["function"]["name"] for item in tool_schemas]
+        if not context and "corpus_search" in names:
+            return {
+                "type": "tool_call",
+                "name": "corpus_search",
+                "arguments": {"query": prompt, "limit": 3},
+            }
+        if len(context) == 1 and "source_lookup" in names:
+            sources = context[0]["result"].get("data", {}).get("sources", [])
+            if sources:
+                return {
+                    "type": "tool_call",
+                    "name": "source_lookup",
+                    "arguments": {"source_id": sources[0]["source_id"]},
+                }
+        return {"type": "final", "context": context}
 
 
 @dataclass

@@ -13,4 +13,4 @@ def test_state_starts_empty():
     assert state.sources == []
     assert state.evidence == []
     assert state.trace == []
-
+    assert state.tool_trace == []

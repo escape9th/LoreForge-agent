@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from .adapters import CorpusSearchProvider, OpenAICompatibleModelProvider
+from .adapters import CorpusSearchProvider, OpenAICompatibleModelProvider, OpenAICompatibleToolCallingProvider
 from .config import Settings
 from .domain import ResearchPackage
 from .repository import RunRepository, RunSummary
@@ -36,7 +36,22 @@ class RunService:
             if not self.settings.use_demo_model
             else None
         )
-        package = run_research(prompt, search=search, model=model)
+        tool_provider = (
+            OpenAICompatibleToolCallingProvider(
+                endpoint=self.settings.model_endpoint,
+                api_key=self.settings.model_api_key,
+                model=self.settings.model_name,
+            )
+            if not self.settings.use_demo_model
+            else None
+        )
+        package = run_research(
+            prompt,
+            search=search,
+            model=model,
+            tool_provider=tool_provider,
+            max_tool_calls=self.settings.max_tool_calls,
+        )
         self.repository.save(package)
         return package
 

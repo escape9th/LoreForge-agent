@@ -21,6 +21,6 @@ def score(prompt: str) -> tuple[int, list[str]]:
 if __name__ == "__main__":
     for case in CASES:
         total, passed = score(case)
-        print(f"[{total}/5] {case}")
+        print(f"[{total}/7] {case}")
         print("  " + "、".join(passed))
     print(f"通过 {len(CASES)} 个 Demo 评测案例")

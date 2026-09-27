@@ -48,6 +48,19 @@ def render_markdown(package: ResearchPackage) -> str:
         ]
     )
     lines.extend(f"- `{event.stage}`：{event.detail}" for event in package.trace)
+    lines.extend(["", "## 工具调用轨迹"])
+    if package.tool_trace:
+        for event in package.tool_trace:
+            lines.extend(
+                [
+                    f"### `{event.tool_name}` · {event.status}",
+                    f"- 输入：`{json.dumps(event.arguments, ensure_ascii=False)}`",
+                    f"- 结果：`{json.dumps(event.result, ensure_ascii=False)}`",
+                    "",
+                ]
+            )
+    else:
+        lines.append("- 本次运行没有调用工具。")
     lines.extend(
         [
             "",
@@ -71,4 +84,3 @@ def write_reports(package: ResearchPackage, output_dir: str | Path) -> tuple[Pat
         encoding="utf-8",
     )
     return markdown_path, json_path
-
