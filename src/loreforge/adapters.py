@@ -191,7 +191,34 @@ class OpenAICompatibleToolCallingProvider(ToolCallingProvider):
             {"role": "user", "content": prompt},
         ]
         for item in context:
-            messages.append({"role": "tool", "content": json.dumps(item, ensure_ascii=False)})
+            action = item["action"]
+            call_id = str(action.get("id") or f"loreforge-{len(messages)}")
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": None,
+                    "tool_calls": [
+                        {
+                            "id": call_id,
+                            "type": "function",
+                            "function": {
+                                "name": action["name"],
+                                "arguments": json.dumps(
+                                    action.get("arguments", {}),
+                                    ensure_ascii=False,
+                                ),
+                            },
+                        }
+                    ],
+                }
+            )
+            messages.append(
+                {
+                    "role": "tool",
+                    "tool_call_id": call_id,
+                    "content": json.dumps(item["result"], ensure_ascii=False),
+                }
+            )
         response = self.transport(
             self.endpoint,
             {"Authorization": f"Bearer {self.api_key}"},
@@ -215,6 +242,7 @@ class OpenAICompatibleToolCallingProvider(ToolCallingProvider):
                 arguments = _parse_json_content(function.get("arguments", "{}"))
                 return {
                     "type": "tool_call",
+                    "id": str(call.get("id", "")),
                     "name": str(function["name"]),
                     "arguments": arguments,
                 }

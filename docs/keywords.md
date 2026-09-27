@@ -22,6 +22,10 @@ These keywords describe capabilities that actually exist in the repository. They
 - REST API
 - observability
 - Agent platform
+- Tool Calling
+- Function Calling
+- Agent tools
+- Agent trace
 
 ## 中文
 
@@ -42,5 +46,9 @@ These keywords describe capabilities that actually exist in the repository. They
 - 可观测性
 - FastAPI 服务
 - SQLite 持久化
+- 工具调用
+- 函数调用
+- Agent 工具注册
+- Agent 执行轨迹
 
 Use only keywords that match a repository capability. Search visibility is useful when it helps the right users find the project, not when it creates unrelated traffic.

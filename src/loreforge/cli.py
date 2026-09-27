@@ -4,7 +4,11 @@ import argparse
 import json
 from pathlib import Path
 
-from .adapters import CorpusSearchProvider, OpenAICompatibleModelProvider
+from .adapters import (
+    CorpusSearchProvider,
+    OpenAICompatibleModelProvider,
+    OpenAICompatibleToolCallingProvider,
+)
 from .config import Settings
 from .domain import ResearchPackage
 from .repository import RunRepository
@@ -67,16 +71,27 @@ def main(argv: list[str] | None = None) -> int:
             if not settings.use_demo_model
             else None
         )
+        tool_provider = (
+            OpenAICompatibleToolCallingProvider(
+                endpoint=settings.model_endpoint,
+                api_key=settings.model_api_key,
+                model=settings.model_name,
+            )
+            if not settings.use_demo_model
+            else None
+        )
         if args.db:
             package = RunService(RunRepository(args.db)).create_run(
                 args.prompt,
                 corpus=args.corpus,
+                max_tool_calls=args.max_tool_calls,
             )
         else:
             package = run_research(
                 args.prompt,
                 search=search,
                 model=model,
+                tool_provider=tool_provider,
                 max_tool_calls=args.max_tool_calls or settings.max_tool_calls,
             )
         markdown_path, json_path = write_reports(package, args.out)

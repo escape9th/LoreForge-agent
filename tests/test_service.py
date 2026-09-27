@@ -1,4 +1,5 @@
 from loreforge.repository import RunRepository
+from loreforge.config import Settings
 from loreforge.service import RunService
 
 
@@ -25,3 +26,29 @@ def test_service_lists_saved_run_summaries(tmp_path):
 
     assert summaries[0].run_id == package.brief.run_id
     assert summaries[0].title == package.blueprint.title
+
+
+def test_service_accepts_a_per_run_tool_call_limit(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_research(prompt, **kwargs):
+        captured.update(kwargs)
+        from loreforge.demo import DemoModelProvider, DemoSearchProvider
+        from loreforge.workflow import run_research
+
+        return run_research(
+            prompt,
+            search=DemoSearchProvider(),
+            model=DemoModelProvider(),
+            max_tool_calls=1,
+        )
+
+    monkeypatch.setattr("loreforge.service.run_research", fake_run_research)
+    service = RunService(
+        RunRepository(tmp_path / "history.sqlite3"),
+        settings=Settings(max_tool_calls=6),
+    )
+
+    service.create_run("设计一个世界观", max_tool_calls=2)
+
+    assert captured["max_tool_calls"] == 2

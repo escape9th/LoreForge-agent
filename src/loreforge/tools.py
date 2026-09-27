@@ -58,6 +58,34 @@ class Tool:
                 {},
                 f"missing required arguments: {', '.join(missing)}",
             )
+        properties = self.spec.parameters.get("properties", {})
+        python_types = {
+            "string": str,
+            "integer": int,
+            "array": list,
+            "object": dict,
+            "boolean": bool,
+        }
+        for name, value in arguments.items():
+            schema = properties.get(name)
+            if schema is None:
+                return ToolResult(self.spec.name, False, {}, f"unknown argument: {name}")
+            expected_name = schema.get("type")
+            expected_type = python_types.get(expected_name)
+            if expected_type is not None and (
+                not isinstance(value, expected_type)
+                or expected_name == "integer" and isinstance(value, bool)
+            ):
+                return ToolResult(
+                    self.spec.name,
+                    False,
+                    {},
+                    f"argument {name} must be {expected_name}",
+                )
+            if "minimum" in schema and value < schema["minimum"]:
+                return ToolResult(self.spec.name, False, {}, f"argument {name} is below minimum")
+            if "maximum" in schema and value > schema["maximum"]:
+                return ToolResult(self.spec.name, False, {}, f"argument {name} exceeds maximum")
         try:
             return ToolResult(self.spec.name, True, self.handler(**arguments))
         except Exception as exc:  # tool failures become inspectable Agent results
@@ -90,19 +118,19 @@ def _all_sources(provider: SearchProvider) -> list[Source]:
 
 
 def build_default_registry(search: SearchProvider) -> ToolRegistry:
+    source_cache = {source.source_id: source for source in _all_sources(search)}
+
     def corpus_search(query: str, limit: int = 3) -> dict[str, Any]:
         bounded_limit = max(1, min(int(limit), 10))
         sources = search.search(query, limit=bounded_limit)
+        source_cache.update({source.source_id: source for source in sources})
         return {
             "query": query,
             "sources": [_source_dict(source) for source in sources],
         }
 
     def source_lookup(source_id: str) -> dict[str, Any]:
-        source = next(
-            (item for item in _all_sources(search) if item.source_id == source_id),
-            None,
-        )
+        source = source_cache.get(source_id)
         if source is None:
             raise ValueError(f"source not found: {source_id}")
         return {"source": _source_dict(source)}

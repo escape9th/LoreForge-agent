@@ -1,5 +1,16 @@
 # Progress
 
+## 2026-09-27
+
+- Approved the offline plus real-model Tool Calling design for v0.4.0.
+- Added tool schemas, registry dispatch, four built-in tools, and structured failures.
+- Added a bounded Tool Calling agent and deterministic offline provider.
+- Added OpenAI-compatible tools/tool_calls parsing and correct tool_call_id replay.
+- Integrated tool traces into workflow packages, reports, persistence, API, CLI, and evaluation.
+- Added tests for tool dispatch, failures, call limits, provider protocol, and configuration.
+- Added a complete Chinese architecture, reproduction, and interview guide.
+- Full release verification passed: 46 tests, 4 evaluation cases at 7/7, compileall, diff check, and manual CLI Tool Calling flow.
+
 ## 2026-09-12
 
 - Confirmed v0.2.0 tests: 18 passed.

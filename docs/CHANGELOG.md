@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.4.0 - 2026-09-27
+
+### Added
+
+- Registered tools with JSON schemas, required-argument validation, and structured results.
+- Built-in corpus search, source lookup, citation checking, and consistency checking tools.
+- Deterministic offline Tool Calling provider and bounded Agent execution loop.
+- OpenAI-compatible `tools` / `tool_calls` protocol support with matching call IDs.
+- Serializable tool traces in Markdown, JSON, SQLite snapshots, and API responses.
+- Tool-use evaluation checks and a complete Chinese architecture/interview guide.
+
+### Changed
+
+- The default research workflow now gathers evidence through the same Tool Calling boundary used by real models.
+- Evaluation cases now score seven structural and tool-use checks.
+
 ## 0.3.0 - 2026-09-12
 
 ### Added

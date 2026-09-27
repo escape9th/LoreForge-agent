@@ -1,17 +1,17 @@
-# v0.3.0 API and Run History
+# v0.4.0 Tool Calling and RAG Trace
 
 ## Goal
 
-Add SQLite run history, a service layer, a FastAPI API, and shared evaluation without breaking the dependency-free Demo.
+Add inspectable Tool Calling, registered RAG tools, a real-model adapter, trace evaluation, and a complete interview guide without breaking the offline Demo.
 
 ## Phases
 
 - [x] Phase 1: Design and implementation plan
-- [x] Phase 2: SQLite repository
-- [x] Phase 3: Service layer and deserialization
-- [x] Phase 4: FastAPI API
-- [x] Phase 5: CLI, evaluation, docs, and release verification
-- [x] Phase 6: Local release commit, tag, and remote push attempt
+- [x] Phase 2: Tool contracts and registry
+- [x] Phase 3: Offline and OpenAI-compatible Tool Calling
+- [x] Phase 4: Workflow trace, reports, and evaluation
+- [x] Phase 5: Documentation and interview guide
+- [x] Phase 6: Release verification, commit, tag, and push attempt
 
 ## Errors Encountered
 
@@ -22,6 +22,7 @@ Add SQLite run history, a service layer, a FastAPI API, and shared evaluation wi
 
 ## Decisions
 
-- Use SQLite snapshot storage instead of multiple normalized tables.
-- Keep FastAPI optional for the core CLI.
-- Preserve the existing workflow and Provider protocols.
+- Keep the default path deterministic and offline.
+- Use a tool whitelist and bounded loop rather than arbitrary code execution.
+- Preserve provider, service, SQLite, CLI, and API boundaries.
+- Keep lightweight retrieval replaceable through `SearchProvider`.

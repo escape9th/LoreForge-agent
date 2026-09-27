@@ -71,3 +71,18 @@ def test_research_package_round_trips_through_dict():
     restored = ResearchPackage.from_dict(package.to_dict())
 
     assert restored == package
+
+
+def test_research_package_loads_a_pre_tool_trace_snapshot():
+    package = run_research(
+        "设计一个失忆角色",
+        search=DemoSearchProvider(),
+        model=DemoModelProvider(),
+    )
+    legacy_data = package.to_dict()
+    legacy_data.pop("tool_trace")
+
+    restored = ResearchPackage.from_dict(legacy_data)
+
+    assert restored.brief == package.brief
+    assert restored.tool_trace == []

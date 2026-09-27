@@ -35,3 +35,11 @@ The Demo uses:
 `RunService` calls the existing workflow and saves the resulting `ResearchPackage` as a JSON snapshot through `RunRepository`. SQLite stores a small searchable summary beside that snapshot, so the system can list recent runs without reconstructing the entire domain object.
 
 `api.py` creates an optional FastAPI application around the service layer. The API does not duplicate workflow logic: `POST /runs` and the CLI `run --db` both use the same service. This keeps behavior consistent while making the project usable as a local Agent backend.
+
+## Tool Calling Boundary
+
+`tools.py` owns JSON-compatible tool schemas, validation, dispatch, and built-in tools. `toolcalling.py` owns the bounded loop between a model decision and the registry. The loop cannot execute arbitrary Python: a model can only name a registered tool and provide arguments that the tool validates.
+
+The offline and OpenAI-compatible providers produce the same action shape. For real providers, assistant `tool_calls` and matching `tool_call_id` values are replayed on the next request. This follows the common OpenAI-compatible function-calling protocol and keeps provider-specific transport details outside the workflow.
+
+Tool traces are part of the domain package, so JSON reports, SQLite snapshots, CLI output, and API responses all expose the same evidence about what the Agent did.

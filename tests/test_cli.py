@@ -1,5 +1,6 @@
 import json
 
+from loreforge.config import Settings
 from loreforge.cli import main
 
 
@@ -99,3 +100,37 @@ def test_history_and_show_commands_read_database(tmp_path, capsys):
 
     assert main(["show", run_id, "--db", str(database)]) == 0
     assert run_id in capsys.readouterr().out
+
+
+def test_run_command_passes_real_tool_provider_and_call_limit(tmp_path, monkeypatch):
+    captured = {}
+
+    def fake_run_research(prompt, **kwargs):
+        captured.update(kwargs)
+        from loreforge.demo import DemoModelProvider, DemoSearchProvider
+        from loreforge.workflow import run_research
+
+        return run_research(
+            prompt,
+            search=DemoSearchProvider(),
+            model=DemoModelProvider(),
+            max_tool_calls=1,
+        )
+
+    monkeypatch.setattr(
+        "loreforge.cli.Settings.from_env",
+        lambda: Settings("https://model.test", "secret", "model", 6),
+    )
+    monkeypatch.setattr("loreforge.cli.run_research", fake_run_research)
+
+    assert main([
+        "run",
+        "设计一个世界观",
+        "--out",
+        str(tmp_path),
+        "--max-tool-calls",
+        "3",
+    ]) == 0
+
+    assert captured["tool_provider"].model == "model"
+    assert captured["max_tool_calls"] == 3

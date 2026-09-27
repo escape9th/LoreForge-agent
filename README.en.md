@@ -1,8 +1,8 @@
 # LoreForge
 
-LoreForge is a small, reproducible, evidence-backed creative research Agent.
+LoreForge is a reproducible, evidence-backed creative research Agent with offline and OpenAI-compatible Tool Calling.
 
-It turns a creative brief into research questions, searches a bounded corpus, preserves evidence, separates factual claims from creative proposals, and verifies whether factual claims have supporting evidence.
+It turns a creative brief into research questions, chooses registered tools, searches a bounded corpus, preserves evidence, separates factual claims from creative proposals, and verifies whether factual claims have supporting evidence. Every tool call is recorded as structured trace data.
 
 ## Quick Start
 
@@ -43,7 +43,7 @@ Endpoints:
 
 ```text
 GET  /health
-POST /runs       {"prompt": "Design an original game world"}
+POST /runs       {"prompt": "Design an original game world", "max_tool_calls": 6}
 GET  /runs
 GET  /runs/{run_id}
 ```
@@ -58,7 +58,7 @@ LoreForge is not just a chat wrapper. It exposes a typed research state, bounded
 Workflow:
 
 ```text
-plan -> gather -> extract -> draft -> verify
+plan -> choose tool -> execute tool -> gather -> extract -> draft -> verify
 ```
 
 ## Keywords
@@ -66,6 +66,7 @@ plan -> gather -> extract -> draft -> verify
 `AI Agent` `LLM` `RAG` `agent workflow` `creative writing` `worldbuilding`
 `game development` `anime` `knowledge grounding` `citation` `evaluation`
 `Python` `FastAPI` `SQLite` `REST API` `run history` `observability`
+`Tool Calling` `Function Calling` `Agent tools` `Agent trace`
 `中文 Agent` `Chinese LLM` `智能体` `智能体平台` `检索增强生成`
 
 See the Chinese README and [`docs/architecture.md`](docs/architecture.md) for implementation details.

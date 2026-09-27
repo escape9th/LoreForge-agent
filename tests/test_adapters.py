@@ -130,6 +130,7 @@ def test_openai_compatible_tool_provider_sends_schemas_and_parses_tool_call():
 
     assert action == {
         "type": "tool_call",
+        "id": "",
         "name": "corpus_search",
         "arguments": {"query": "floating city", "limit": 2},
     }
@@ -147,3 +148,35 @@ def test_openai_compatible_tool_provider_parses_final_action():
     )
 
     assert provider.next_action("done", [], []) == {"type": "final"}
+
+
+def test_openai_compatible_tool_provider_replays_tool_call_protocol():
+    payloads = []
+
+    def transport(endpoint, headers, payload):
+        payloads.append(payload)
+        return {"choices": [{"message": {"content": '{"type": "final"}'}}]}
+
+    provider = OpenAICompatibleToolCallingProvider(
+        endpoint="https://model.example.test/v1/chat/completions",
+        api_key="test-key",
+        model="demo-model",
+        transport=transport,
+    )
+    context = [{
+        "action": {
+            "type": "tool_call",
+            "id": "call-123",
+            "name": "corpus_search",
+            "arguments": {"query": "city"},
+        },
+        "result": {"tool_name": "corpus_search", "ok": True, "data": {"sources": []}, "error": ""},
+    }]
+
+    provider.next_action("city", context, [])
+
+    assistant, tool = payloads[0]["messages"][-2:]
+    assert assistant["role"] == "assistant"
+    assert assistant["tool_calls"][0]["id"] == "call-123"
+    assert tool["role"] == "tool"
+    assert tool["tool_call_id"] == "call-123"

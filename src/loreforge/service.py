@@ -25,6 +25,7 @@ class RunService:
         prompt: str,
         *,
         corpus: str | Path | None = None,
+        max_tool_calls: int | None = None,
     ) -> ResearchPackage:
         search = CorpusSearchProvider.from_json(corpus) if corpus else None
         model = (
@@ -50,7 +51,7 @@ class RunService:
             search=search,
             model=model,
             tool_provider=tool_provider,
-            max_tool_calls=self.settings.max_tool_calls,
+            max_tool_calls=max_tool_calls or self.settings.max_tool_calls,
         )
         self.repository.save(package)
         return package

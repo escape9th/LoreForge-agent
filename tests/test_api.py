@@ -14,7 +14,7 @@ def test_health_endpoint_reports_service_version(tmp_path):
 
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
-    assert response.json()["version"] == "0.3.0"
+    assert response.json()["version"] == "0.4.0"
 
 
 def test_create_list_and_get_run(tmp_path):
@@ -42,3 +42,13 @@ def test_api_rejects_blank_prompt_and_unknown_run(tmp_path):
 
     assert blank.status_code == 422
     assert missing.status_code == 404
+
+
+def test_api_accepts_a_tool_call_limit(tmp_path):
+    response = client_for(tmp_path).post(
+        "/runs",
+        json={"prompt": "设计一个游戏任务", "max_tool_calls": 1},
+    )
+
+    assert response.status_code == 200
+    assert len(response.json()["package"]["tool_trace"]) == 1

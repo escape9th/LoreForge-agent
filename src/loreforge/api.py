@@ -22,6 +22,7 @@ if BaseModel is not None:
     class RunRequest(BaseModel):
         prompt: str
         corpus: str | None = None
+        max_tool_calls: int | None = None
 
 else:
 
@@ -59,7 +60,11 @@ def create_app(
     @app.post("/runs")
     def create_run(request: RunRequest) -> dict[str, Any]:
         try:
-            package = service.create_run(request.prompt, corpus=request.corpus)
+            package = service.create_run(
+                request.prompt,
+                corpus=request.corpus,
+                max_tool_calls=request.max_tool_calls,
+            )
         except ValueError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         return {
